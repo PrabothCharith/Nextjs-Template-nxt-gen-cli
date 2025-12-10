@@ -116,4 +116,4 @@ npx . test-app
 
 ## License
 
-MIT © Praboth Charith
+MIT © [Praboth Charith](https://praboth.me)
