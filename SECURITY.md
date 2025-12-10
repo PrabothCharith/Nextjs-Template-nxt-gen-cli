@@ -15,7 +15,7 @@ currently being supported with security updates.
 We take security seriously. If you discover a security vulnerability within `nxt-gen`, please follow these steps:
 
 1. **Do not open a public issue.** This could expose the vulnerability before we have a chance to fix it.
-2. Send an email to the maintainer at [your-email@example.com] (or contact via <https://praboth.me>).
+2. Send an email to the maintainer via <https://praboth.me>.
 3. Include as much detail as possible:
     * Type of issue (e.g., injection, XSS, etc.)
     * Step-by-step instructions to reproduce the issue.
