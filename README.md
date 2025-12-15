@@ -8,14 +8,15 @@ nxt-gen-cli streamlines Next.js project creation by automating the installation 
 
 ## Installation
 
-```bash
-npm install -g nxt-gen-cli
-```
-
-Or run directly without installation:
-
+With npx **(Recommended)**:
 ```bash
 npx nxt-gen-cli my-project
+```
+
+Or install globally **(Beta)**:
+
+```bash
+npm install -g nxt-gen-cli
 ```
 
 ## Quick Start
@@ -186,6 +187,7 @@ Praboth Charith - [praboth.me](https://praboth.me)
 
 ## Links
 
+- [Website](https://praboth.me/nxt-gen-cli)
 - [GitHub Repository](https://github.com/PrabothCharith/Nextjs-Template-nxt-gen)
 - [Issue Tracker](https://github.com/PrabothCharith/Nextjs-Template-nxt-gen/issues)
 - [npm Package](https://www.npmjs.com/package/nxt-gen-cli)
