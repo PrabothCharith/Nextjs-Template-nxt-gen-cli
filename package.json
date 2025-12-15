@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PrabothCharith/Nextjs-Template-nxt-gen.git"
+    "url": "git+https://github.com/PrabothCharith/nxt-gen-cli.git"
   },
   "keywords": [
     "nextjs",
@@ -47,9 +47,9 @@
   ],
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/PrabothCharith/Nextjs-Template-nxt-gen/issues"
+    "url": "https://github.com/PrabothCharith/nxt-gen-cli/issues"
   },
-  "homepage": "https://github.com/PrabothCharith/Nextjs-Template-nxt-gen#readme",
+  "homepage": "https://github.com/PrabothCharith/nxt-gen-cli#readme",
   "dependencies": {
     "chalk": "^5.6.2",
     "commander": "^14.0.2",

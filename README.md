@@ -188,6 +188,6 @@ Praboth Charith - [praboth.me](https://praboth.me)
 ## Links
 
 - [Website](https://praboth.me/nxt-gen-cli)
-- [GitHub Repository](https://github.com/PrabothCharith/Nextjs-Template-nxt-gen)
-- [Issue Tracker](https://github.com/PrabothCharith/Nextjs-Template-nxt-gen/issues)
+- [GitHub Repository](https://github.com/PrabothCharith/nxt-gen-cli)
+- [Issue Tracker](https://github.com/PrabothCharith/nxt-gen-cli/issues)
 - [npm Package](https://www.npmjs.com/package/nxt-gen-cli)
