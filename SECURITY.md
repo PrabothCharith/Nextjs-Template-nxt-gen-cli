@@ -12,7 +12,7 @@ currently being supported with security updates.
 
 ## Reporting a Vulnerability
 
-We take security seriously. If you discover a security vulnerability within `nxt-gen`, please follow these steps:
+We take security seriously. If you discover a security vulnerability within `nxt-gen-cli`, please follow these steps:
 
 1. **Do not open a public issue.** This could expose the vulnerability before we have a chance to fix it.
 2. Send an email to the maintainer via <https://praboth.me>.
