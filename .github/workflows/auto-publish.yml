@@ -5,6 +5,11 @@ on:
     branches:
       - main  # Trigger on every successful merge to main
 
+      
+permissions:
+  id-token: write
+  contents: write  # Required for pushing tags and creating releases
+
 jobs:
   check-and-publish:
     runs-on: ubuntu-latest
@@ -57,8 +62,6 @@ jobs:
       - name: Publish to npm
         if: steps.version.outputs.should_publish == 'true'
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create Git Tag
         if: steps.version.outputs.should_publish == 'true'
