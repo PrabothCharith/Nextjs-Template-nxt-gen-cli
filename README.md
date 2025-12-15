@@ -1,119 +1,191 @@
-# nxt-gen-cli: Next.js CLI
+# nxt-gen-cli
 
-![npm version](https://img.shields.io/npm/v/nxt-gen-cli?style=flat-square)
-![license](https://img.shields.io/npm/l/nxt-gen-cli?style=flat-square)
+A command-line tool for scaffolding Next.js projects with a customizable tech stack. Skip the repetitive setup and get straight to building.
 
-A powerful, interactive CLI tool to scaffold production-ready Next.js applications custom features.
+## Overview
 
-Stop copying and pasting boilerplate code. Generate a custom stack in seconds.
-
-## Features
-
-- **Production-Ready Base**: Next.js 14+, TypeScript, Tailwind CSS (v4 compatible), ESLint.
-- **Database Ready**: Optional **Prisma ORM** setup for SQLite (default) or PostgreSQL.
-- **State Management**: Optional **React Query** (TanStack Query) integration.
-- **Networking**: Pre-configured **Axios** instance.
-- **UI Libraries**: One-click setup for **Shadcn UI** and **HeroUI** (NextUI).
-- **Animations**: Integrated **Framer Motion** support.
-- **Icons**: **Lucide React** icons pre-installed.
-- **Smart Examples**: Dynamically generates **CRUD** and **Auth** example code based on your selected stack.
-
-## Quick Start
-
-Run the generator directly with `npx`:
-
-```bash
-npx nxt-gen-cli@latest my-app
-```
-
-Follow the interactive prompts to choose your stack!
+nxt-gen-cli streamlines Next.js project creation by automating the installation and configuration of commonly used libraries. Instead of manually installing and wiring up Prisma, React Query, Axios, and UI frameworks, this CLI handles it for you through an interactive prompt or command-line flags.
 
 ## Installation
-
-Alternatively, install it globally:
 
 ```bash
 npm install -g nxt-gen-cli
 ```
 
-Then generate a project anywhere:
+Or run directly without installation:
 
 ```bash
-cnp my-new-project
+npx nxt-gen-cli my-project
 ```
 
-## Usage
+## Quick Start
 
 ### Interactive Mode
 
-Just run the command without flags:
+Run the CLI without arguments to use the interactive prompt:
 
 ```bash
-npx nxt-gen-cli@latest my-app
+nxt-gen-cli
 ```
 
-You will be asked about:
+You will be guided through selecting your project name and preferred stack options.
 
-- Prisma ORM
-- React Query
-- Axios
-- UI Library (Shadcn / HeroUI)
-- Animations & Icons
-- Example Pages
+### Command-Line Mode
 
-### Non-Interactive (Flags)
-
-Perfect for scripts or power users:
+Specify options directly for non-interactive usage:
 
 ```bash
-# Create a full-stack app with all features
-npx nxt-gen-cli@latest my-app --prisma --react-query --axios --ui both --framer-motion --lucide --examples both
+nxt-gen-cli my-project --prisma --react-query --axios --ui shadcn --framer-motion --lucide
 ```
 
-| Flag | Description |
-|------|-------------|
-| `--prisma` | Install and configure Prisma ORM |
-| `--react-query` | Install and configure TanStack Query |
-| `--axios` | Install and configure Axios |
-| `--ui <type>` | Choose UI: `shadcn`, `heroui`, `both`, or `none` |
-| `--framer-motion` | Install Framer Motion |
-| `--lucide` | Install Lucide React Icons |
-| `--examples <type>` | Generate examples: `crud`, `auth`, `both`, or `none` |
+## Features
 
-## Generated Structure
+### Database
 
-Depending on your choices, your project will look like this:
+| Feature | Description                                                         |
+| ------- | ------------------------------------------------------------------- |
+| Prisma  | Full Prisma ORM setup with schema template and client configuration |
 
-```text
-my-app/
-├── prisma/               # (If selected) Schema and migrations
+### State Management and API
+
+| Feature     | Description                                         |
+| ----------- | --------------------------------------------------- |
+| React Query | TanStack Query with provider component ready to use |
+| Axios       | Pre-configured Axios client instance                |
+
+### UI Libraries
+
+| Option | Description                                                             |
+| ------ | ----------------------------------------------------------------------- |
+| shadcn | Tailwind CSS utilities with class-variance-authority and tailwind-merge |
+| HeroUI | Complete HeroUI setup with Tailwind configuration                       |
+| Both   | Install both shadcn utilities and HeroUI                                |
+| None   | Skip UI library installation                                            |
+
+### Additional Libraries
+
+| Feature       | Description                           |
+| ------------- | ------------------------------------- |
+| Framer Motion | Animation library for React           |
+| Lucide React  | Icon library with tree-shakable icons |
+
+### Example Templates
+
+| Option | Description                                                          |
+| ------ | -------------------------------------------------------------------- |
+| CRUD   | Sample API route and page demonstrating create/read operations       |
+| Auth   | Authentication page placeholder for extending with NextAuth or Clerk |
+| Both   | Include both example templates                                       |
+| None   | Skip example generation                                              |
+
+## CLI Options
+
+```
+Usage: nxt-gen-cli [name] [options]
+
+Arguments:
+  name                    Project name (prompted if not provided)
+
+Options:
+  --prisma                Install Prisma ORM
+  --react-query           Install React Query (TanStack Query)
+  --axios                 Install Axios HTTP client
+  --ui <type>             UI library: shadcn, heroui, both, none
+  --framer-motion         Install Framer Motion
+  --lucide                Install Lucide React icons
+  --examples <type>       Example templates: crud, auth, both, none
+  -V, --version           Output version number
+  -h, --help              Display help information
+```
+
+## Project Structure
+
+After scaffolding, your project will have the following structure based on selected options:
+
+```
+my-project/
+├── prisma/
+│   └── schema.prisma          # Prisma schema (if --prisma)
 ├── src/
 │   ├── app/
-│   │   ├── api/          # (If examples) API Routes
-│   │   ├── posts/        # (If examples) CRUD Example Page
-│   │   ├── layout.tsx    # Wrapped with Providers automatically
-│   │   └── ...
+│   │   ├── api/
+│   │   │   └── posts/
+│   │   │       └── route.ts   # Example API route (if --examples crud)
+│   │   ├── auth/
+│   │   │   └── page.tsx       # Auth page placeholder (if --examples auth)
+│   │   ├── posts/
+│   │   │   └── page.tsx       # Example page (if --examples crud)
+│   │   ├── layout.tsx         # Root layout with Providers wrapper
+│   │   └── page.tsx           # Home page
 │   ├── components/
-│   │   └── providers/    # Query & UI Providers
-│   ├── lib/
-│   │   ├── prisma.ts     # (If selected) Prisma Client Singleton
-│   │   ├── axios.ts      # (If selected) Axios Instance
-│   │   └── utils.ts      # CN helper and util functions
-│   └── ...
-├── tailwind.config.ts    # Auto-configured for HeroUI/Shadcn
-└── ...
+│   │   ├── providers/
+│   │   │   └── query-provider.tsx  # React Query provider (if --react-query)
+│   │   └── providers.tsx      # Combined providers component
+│   └── lib/
+│       ├── axios.ts           # Axios client (if --axios)
+│       ├── prisma.ts          # Prisma client (if --prisma)
+│       └── utils.ts           # Utility functions (if --ui shadcn)
+├── package.json
+├── tailwind.config.ts
+└── tsconfig.json
 ```
+
+## Base Stack
+
+Every project created with nxt-gen-cli includes:
+
+- Next.js with App Router
+- TypeScript
+- Tailwind CSS
+- ESLint
+- `src/` directory structure
+- `@/*` import alias
+
+## Examples
+
+### Full Stack Project
+
+```bash
+nxt-gen-cli my-app --prisma --react-query --axios --ui both --framer-motion --lucide --examples both
+```
+
+### Minimal API Project
+
+```bash
+nxt-gen-cli api-service --prisma --axios
+```
+
+### Frontend-Only Project
+
+```bash
+nxt-gen-cli landing-page --ui shadcn --framer-motion --lucide
+```
+
+## Requirements
+
+- Node.js 18.17.0 or later
+- npm 9.0.0 or later
 
 ## Contributing
 
-Contributions are welcome! Please verify your changes by running the test command before submitting a PR.
+Contributions are welcome. Please open an issue to discuss proposed changes before submitting a pull request.
 
-```bash
-# Run local test
-npm run build
-npx . test-app
-```
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a pull request
 
 ## License
 
-MIT © [Praboth Charith](https://praboth.me)
+MIT License. See [LICENSE.md](LICENSE.md) for details.
+
+## Author
+
+Praboth Charith - [praboth.me](https://praboth.me)
+
+## Links
+
+- [GitHub Repository](https://github.com/PrabothCharith/Nextjs-Template-nxt-gen)
+- [Issue Tracker](https://github.com/PrabothCharith/Nextjs-Template-nxt-gen/issues)
+- [npm Package](https://www.npmjs.com/package/nxt-gen-cli)
