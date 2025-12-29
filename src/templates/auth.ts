@@ -105,7 +105,7 @@ export default async function AuthPage() {
             </p>
             
             <a
-              href="/api/auth/signin?callbackUrl=/auth"
+              href="/api/auth/signin?callbackUrl=/"
               className="block w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               Sign In with GitHub

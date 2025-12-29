@@ -13,7 +13,11 @@ import {
   providersComponent,
 } from "./templates/base.js";
 
-import { exampleApiHandler, examplePage } from "./templates/examples.js";
+import {
+  exampleApiHandler,
+  examplePage,
+  hubPage,
+} from "./templates/examples.js";
 import { dockerfile, ciWorkflow, envExample } from "./templates/devops.js";
 import {
   vitestConfig,
@@ -595,6 +599,35 @@ async function setupProviders(projectPath: string, config: ProjectConfig) {
     path.join(projectPath, "src/components/providers.tsx"),
     providersComponent(config)
   );
+
+  // Dynamic Home Page Generation
+  // If examples are selected, we overwrite the default page.tsx with the appropriate entry point
+  if (config.examples && config.examples !== "none") {
+    let homePageContent = "";
+
+    if (config.examples === "auth" && config.auth !== "none") {
+      // Auth Only: Show Auth Dashboard as Home
+      if (config.auth === "next-auth") {
+        homePageContent = nextAuthPage; // This now has callbackUrl=/
+      } else if (config.auth === "clerk") {
+        homePageContent = clerkAuthPage;
+      }
+    } else if (config.examples === "crud") {
+      // CRUD Only: Show Posts Manager as Home
+      homePageContent = examplePage(config.reactQuery, config.axios);
+    } else if (config.examples === "both") {
+      // Both: Show Hub Page
+      homePageContent = hubPage;
+    }
+
+    if (homePageContent) {
+      // We overwrite the existing page.tsx
+      await fs.writeFile(
+        path.join(projectPath, "src/app/page.tsx"),
+        homePageContent
+      );
+    }
+  }
 
   // 2. Wrap layout using AST
   await addProviderToLayout(projectPath);
