@@ -27,6 +27,8 @@ import {
   nextAuthFile,
   nextAuthApiRoute,
   clerkMiddleware,
+  nextAuthPage,
+  clerkAuthPage,
   nextAuthEnv,
   clerkEnv,
 } from "./templates/auth.js";
@@ -561,17 +563,27 @@ async function setupExamples(projectPath: string, config: ProjectConfig) {
     );
   }
 
-  // Auth example (Basic skeleton)
+  // Auth example
   if (config.examples === "auth" || config.examples === "both") {
-    // Just a placeholder page
     await fs.ensureDir(path.join(projectPath, "src/app/auth"));
+
+    let pageContent = "";
+    if (config.auth === "next-auth") {
+      pageContent = nextAuthPage;
+    } else if (config.auth === "clerk") {
+      pageContent = clerkAuthPage;
+    } else {
+      // Fallback if no auth provider selected but example requested
+      pageContent = `
+export default function AuthPage() {
+    return <div>Please select an authentication provider (NextAuth or Clerk) to view this example.</div>
+}
+`;
+    }
+
     await fs.writeFile(
       path.join(projectPath, "src/app/auth/page.tsx"),
-      `
-export default function AuthPage() {
-    return <div>Auth Page Placeholder (Extend with NextAuth/Clerk)</div>
-}
-`
+      pageContent
     );
   }
 }
