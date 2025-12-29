@@ -221,7 +221,7 @@ export const scaffoldProject = async (
   console.log("\n");
   console.log(
     chalk.cyan.bold(
-      "  ╔═══════════════════════════════════════════════════════════════╗"
+      "  ╔═════════════════════════════════════════════════════════════════════╗"
     )
   );
   console.log(
@@ -278,7 +278,7 @@ export const scaffoldProject = async (
   );
   console.log(
     chalk.cyan.bold(
-      "  ╚═══════════════════════════════════════════════════════════════╝"
+      "  ╚═════════════════════════════════════════════════════════════════════╝"
     )
   );
   console.log("\n");
@@ -286,14 +286,14 @@ export const scaffoldProject = async (
   // Success Message
   console.log(
     boxen(
-      chalk.green.bold("✨ SUCCESS! ✨") +
+      chalk.green.bold(" SUCCESS! ") +
         "\n\n" +
         `Your Next.js project ${chalk.cyan.bold(
           projectName
         )} has been created!\n` +
         chalk.gray("━".repeat(60)) +
         "\n\n" +
-        chalk.yellow.bold("🚀 Quick Start:\n") +
+        chalk.yellow.bold(" Quick Start:\n") +
         chalk.white(
           `  ${chalk.cyan("1.")} cd ${chalk.magenta(projectName)}\n`
         ) +
@@ -340,7 +340,7 @@ export const scaffoldProject = async (
             )
           : "") +
         "\n" +
-        chalk.yellow.bold("📚 Documentation:\n") +
+        chalk.yellow.bold(" Documentation:\n") +
         chalk.white(
           `  ${chalk.cyan("•")} Check out ${chalk.magenta(
             "README.md"
@@ -365,7 +365,7 @@ export const scaffoldProject = async (
             ".env.example"
           )} for all config options\n\n`
         ) +
-        chalk.yellow.bold("💡 Pro Tips:\n") +
+        chalk.yellow.bold(" Pro Tips:\n") +
         chalk.white(
           `  ${chalk.cyan("•")} Star the repo: ${chalk.blue.underline(
             "github.com/PrabothCharith/nxt-gen-cli"
@@ -382,7 +382,7 @@ export const scaffoldProject = async (
         chalk.gray("━".repeat(60)) +
         "\n" +
         chalk.white("Happy coding! ") +
-        chalk.gray("Built with love by ") +
+        chalk.gray("Built by ") +
         chalk.cyan.bold("Praboth Charith\n") +
         chalk.blue.underline("https://praboth.me"),
       {
