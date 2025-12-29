@@ -17,7 +17,8 @@ export async function main() {
   const program = new Command();
 
   // Update Notifier
-  updateNotifier({ pkg }).notify();
+  // updateNotifier({ pkg }).notify();
+  console.log("CLI Starting...");
 
   // Banner
   console.log(
@@ -38,6 +39,16 @@ export async function main() {
     .option("--framer-motion", "Install Framer Motion")
     .option("--lucide", "Install Lucide React")
     .option("--examples <type>", "Examples (crud, auth, both, none)")
+    .option("--docker", "Add Docker Support")
+    .option("--ci", "Add CI/CD (GitHub Actions)")
+    .option("--husky", "Add Husky & Lint-staged")
+    .option("--vitest", "Add Vitest")
+    .option("--playwright", "Add Playwright")
+    .option("--storybook", "Add Storybook")
+    .option("--forms", "Add Forms (RHF + Zod)")
+    .option("--intl", "Add Internationalization (next-intl)")
+    .option("--auth <type>", "Auth Provider (next-auth, clerk, none)")
+    .option("--license <type>", "License (MIT, Apache, none)")
     .action(async (name, options) => {
       let projectName = name;
 
