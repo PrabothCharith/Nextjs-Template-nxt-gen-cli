@@ -1,16 +1,11 @@
 export const nextAuthFile = `import NextAuth from "next-auth"
 import GithubProvider from "next-auth/providers/github"
- 
-export const {
-  handlers,
-  auth,
-  signIn,
-  signOut,
-} = NextAuth({
+
+const handler = NextAuth({
   providers: [
     GithubProvider({
-      clientId: process.env.GITHUB_ID,
-      clientSecret: process.env.GITHUB_SECRET,
+      clientId: process.env.GITHUB_ID || "",
+      clientSecret: process.env.GITHUB_SECRET || "",
     }),
   ],
   pages: {
@@ -18,11 +13,10 @@ export const {
   },
 })
 
-export const { GET, POST } = handlers
+export { handler as GET, handler as POST }
 `;
 
-export const nextAuthApiRoute = `import { GET, POST } from "@/lib/auth"
-export { GET, POST }
+export const nextAuthApiRoute = `export { GET, POST } from "@/lib/auth"
 `;
 
 export const nextAuthMiddleware = `import { auth } from "@/lib/auth"
