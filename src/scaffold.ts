@@ -26,7 +26,6 @@ import { readmeTemplate, mitLicense, apacheLicense } from "./templates/docs.js";
 import {
   nextAuthFile,
   nextAuthApiRoute,
-  nextAuthMiddleware,
   clerkMiddleware,
   nextAuthEnv,
   clerkEnv,
@@ -810,11 +809,6 @@ async function setupAuth(
     await fs.writeFile(
       path.join(projectPath, "src/app/api/auth/[...nextauth]/route.ts"),
       nextAuthApiRoute
-    );
-
-    await fs.writeFile(
-      path.join(projectPath, "src/middleware.ts"),
-      nextAuthMiddleware
     );
 
     // Env
