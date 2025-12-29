@@ -31,6 +31,7 @@ import {
   nextAuthEnv,
   clerkEnv,
 } from "./templates/auth.js";
+import { formSchema, exampleForm } from "./templates/forms.js";
 import {
   detectPackageManager,
   getInstallCommand,
@@ -110,6 +111,7 @@ export const scaffoldProject = async (
   await setupDocumentation(projectPath, config, pm, projectName);
 
   if (config.auth !== "none") await setupAuth(projectPath, config, pm);
+  if (config.forms) await setupForms(projectPath, pm);
 
   console.log(
     boxen(
@@ -588,4 +590,26 @@ async function setupAuth(
   }
 
   spinner.succeed("Authentication setup setup complete");
+}
+
+async function setupForms(projectPath: string, pm: PackageManager) {
+  const spinner = ora("Setting up Forms & Validation...").start();
+
+  const install = getInstallCommand(
+    pm,
+    ["react-hook-form", "zod", "@hookform/resolvers"],
+    false
+  );
+  await runCommand(install.command, install.args, projectPath);
+
+  await fs.ensureDir(path.join(projectPath, "src/lib"));
+  await fs.writeFile(path.join(projectPath, "src/lib/schemas.ts"), formSchema);
+
+  await fs.ensureDir(path.join(projectPath, "src/components/examples"));
+  await fs.writeFile(
+    path.join(projectPath, "src/components/examples/contact-form.tsx"),
+    exampleForm
+  );
+
+  spinner.succeed("Forms & Validation setup complete");
 }

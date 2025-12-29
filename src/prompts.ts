@@ -11,10 +11,10 @@ export interface ProjectConfig {
   docker: boolean;
   ci: boolean;
   husky: boolean;
-
   vitest: boolean;
   playwright: boolean;
   storybook: boolean;
+  forms: boolean;
   license: "MIT" | "Apache" | "none";
   auth: "next-auth" | "clerk" | "none";
 }
@@ -36,6 +36,7 @@ export async function initialPrompt(
     vitest: false,
     playwright: false,
     storybook: false,
+    forms: false,
     license: "none",
     auth: "none",
     ...options,
