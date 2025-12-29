@@ -2,7 +2,7 @@ export const nextAuthFile = `import NextAuth from "next-auth"
 import GithubProvider from "next-auth/providers/github"
  
 export const {
-  handlers: { GET, POST },
+  handlers,
   auth,
   signIn,
   signOut,
@@ -17,6 +17,8 @@ export const {
     signIn: '/auth/signin',
   },
 })
+
+export const { GET, POST } = handlers
 `;
 
 export const nextAuthApiRoute = `import { GET, POST } from "@/lib/auth"
