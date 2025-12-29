@@ -17,8 +17,6 @@ export async function addProviderToLayout(projectPath: string) {
 
   if (!hasImport) {
     sourceFile.addImportDeclaration({
-      defaultImport: "{ Providers }", // Actually it's a named import in the string version, let's correct that.
-      // Original string: "import { Providers } from '@/components/providers';\n"
       namedImports: ["Providers"],
       moduleSpecifier: "@/components/providers",
     });
