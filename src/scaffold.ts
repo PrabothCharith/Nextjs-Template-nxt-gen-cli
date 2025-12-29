@@ -1,23 +1,24 @@
 import path from "path";
 import fs from "fs-extra";
-import { ProjectConfig } from "./prompts";
-import { runCommand } from "./lib/utils";
+import { ProjectConfig } from "./prompts.js";
+import { runCommand } from "./lib/utils.js";
 import chalk from "chalk";
 import ora from "ora";
+import boxen from "boxen";
 import {
   prismaSchema,
   prismaClient,
   axiosClient,
   queryProvider,
   providersComponent,
-} from "./templates/base";
-import { exampleApiHandler, examplePage } from "./templates/examples";
+} from "./templates/base.js";
+import { exampleApiHandler, examplePage } from "./templates/examples.js";
 import {
   detectPackageManager,
   getInstallCommand,
   getDlxCommand,
   PackageManager,
-} from "./lib/pm";
+} from "./lib/pm.js";
 
 export const scaffoldProject = async (
   projectName: string,
@@ -69,7 +70,23 @@ export const scaffoldProject = async (
 
   await setupProviders(projectPath, config);
 
-  console.log(chalk.green(`\nSuccessfully created project ${projectName}!\n`));
+  console.log(
+    boxen(
+      `${chalk.green.bold("Success!")} Project ${chalk.cyan(
+        projectName
+      )} created.\n\n` +
+        `${chalk.yellow("Next steps:")}\n` +
+        `  cd ${projectName}\n` +
+        `  ${pm === "npm" ? "npm run dev" : pm + " dev"}`,
+      {
+        padding: 1,
+        margin: 1,
+        borderStyle: "double",
+        borderColor: "green",
+      }
+    )
+  );
+
   console.log(chalk.cyan(`Created by Praboth Charith (https://praboth.me)\n`));
 };
 
