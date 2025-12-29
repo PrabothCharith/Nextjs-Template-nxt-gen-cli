@@ -40,8 +40,6 @@ import {
   PackageManager,
 } from "./lib/pm.js";
 import { addProviderToLayout, configureTailwindForHeroUI } from "./lib/ast.js";
-import { DependencyCollector } from "./lib/deps.js";
-import prompts from "prompts";
 
 export const scaffoldProject = async (
   projectName: string,
@@ -49,7 +47,6 @@ export const scaffoldProject = async (
 ) => {
   const projectPath = path.resolve(process.cwd(), projectName);
   const pm = detectPackageManager();
-  const deps = new DependencyCollector();
 
   // Check if directory already exists
   if (await fs.pathExists(projectPath)) {
@@ -89,17 +86,14 @@ export const scaffoldProject = async (
 
   await cleanupDefaultFiles(projectPath);
 
-  // Generate all files (no installations yet)
-  console.log(chalk.blue("\nGenerating project files...\n"));
+  if (config.prisma) await setupPrisma(projectPath, pm);
+  if (config.reactQuery) await setupReactQuery(projectPath, pm);
+  if (config.axios) await setupAxios(projectPath, pm);
 
-  if (config.prisma) await setupPrisma(projectPath, deps);
-  if (config.reactQuery) await setupReactQuery(projectPath, deps);
-  if (config.axios) await setupAxios(projectPath, deps);
+  await setupUI(projectPath, config.ui, pm);
 
-  await setupUI(projectPath, config.ui, deps);
-
-  if (config.framerMotion) await setupFramerMotion(projectPath, deps);
-  if (config.lucide) await setupLucide(projectPath, deps);
+  if (config.framerMotion) await setupFramerMotion(projectPath, pm);
+  if (config.lucide) await setupLucide(projectPath, pm);
 
   if (config.examples !== "none") {
     await setupExamples(projectPath, config);
@@ -118,129 +112,18 @@ export const scaffoldProject = async (
     )
   );
 
-  if (config.husky) await setupQuality(projectPath, deps);
+  if (config.husky) await setupQuality(projectPath, pm);
 
   if (config.vitest || config.playwright)
-    await setupTesting(projectPath, config, deps);
+    await setupTesting(projectPath, config, pm);
 
-  if (config.storybook) await setupStorybook(projectPath, pm, deps);
+  if (config.storybook) await setupStorybook(projectPath, pm);
 
   await setupDocumentation(projectPath, config, pm, projectName);
 
-  if (config.auth !== "none") await setupAuth(projectPath, config, deps);
-  if (config.forms) await setupForms(projectPath, deps);
-  if (config.intl) await setupIntl(projectPath, deps);
-
-  // Batch installation logic
-  console.log(chalk.blue("\nFiles generated successfully!"));
-
-  const { deps: regularDeps, devDeps } = deps.getAll();
-  const totalDeps = regularDeps.length + devDeps.length;
-
-  if (totalDeps > 0) {
-    console.log(chalk.cyan(`\nCollected ${totalDeps} dependencies:`));
-    if (regularDeps.length > 0) {
-      console.log(
-        chalk.white("  Dependencies:"),
-        regularDeps.slice(0, 5).join(", ") +
-          (regularDeps.length > 5 ? ` +${regularDeps.length - 5} more` : "")
-      );
-    }
-    if (devDeps.length > 0) {
-      console.log(
-        chalk.white("  Dev Dependencies:"),
-        devDeps.slice(0, 5).join(", ") +
-          (devDeps.length > 5 ? ` +${devDeps.length - 5} more` : "")
-      );
-    }
-
-    const { shouldInstall } = await prompts(
-      {
-        type: "confirm",
-        name: "shouldInstall",
-        message: "Install dependencies now?",
-        initial: true,
-      },
-      {
-        onCancel: () => {
-          console.log(
-            chalk.yellow("\nSkipping installation. To install later:")
-          );
-          console.log(chalk.cyan(`  cd ${projectName}`));
-          console.log(chalk.cyan(`  ${pm} install`));
-          process.exit(0);
-        },
-      }
-    );
-
-    if (shouldInstall) {
-      const spinner = ora("Installing dependencies...").start();
-
-      try {
-        // Install regular dependencies
-        if (regularDeps.length > 0) {
-          const install = getInstallCommand(pm, regularDeps, false);
-          await runCommand(install.command, install.args, projectPath);
-        }
-
-        // Install dev dependencies
-        if (devDeps.length > 0) {
-          const installDev = getInstallCommand(pm, devDeps, true);
-          await runCommand(installDev.command, installDev.args, projectPath);
-        }
-
-        spinner.succeed("Dependencies installed successfully");
-
-        // Run post-install commands
-        if (config.husky) {
-          const huskySpinner = ora("Initializing Husky...").start();
-          const dlx = getDlxCommand(pm);
-          await runCommand(
-            dlx.command,
-            [...dlx.args, "husky", "init"],
-            projectPath
-          );
-          const preCommitPath = path.join(projectPath, ".husky/pre-commit");
-          await fs.writeFile(preCommitPath, "npx lint-staged");
-          huskySpinner.succeed("Husky initialized");
-        }
-
-        if (config.prisma) {
-          const prismaSpinner = ora("Initializing Prisma...").start();
-          const dlx = getDlxCommand(pm);
-          await runCommand(
-            dlx.command,
-            [...dlx.args, "prisma", "init"],
-            projectPath
-          );
-          prismaSpinner.succeed("Prisma initialized");
-        }
-
-        if (config.playwright) {
-          const playwrightSpinner = ora(
-            "Installing Playwright browsers..."
-          ).start();
-          const dlx = getDlxCommand(pm);
-          await runCommand(
-            dlx.command,
-            [...dlx.args, "playwright", "install", "--with-deps"],
-            projectPath
-          );
-          playwrightSpinner.succeed("Playwright browsers installed");
-        }
-      } catch (error) {
-        spinner.fail("Installation failed");
-        console.log(chalk.red("\nError:"), error);
-        console.log(chalk.yellow("\nYou can install dependencies manually:"));
-        console.log(chalk.cyan(`  cd ${projectName}`));
-        console.log(chalk.cyan(`  ${pm} install`));
-      }
-    } else {
-      console.log(chalk.yellow("\nSkipping installation. To install later:"));
-      console.log(chalk.cyan(`  cd ${projectName}`));
-      console.log(chalk.cyan(`  ${pm} install`));
-    }
-  }
+  if (config.auth !== "none") await setupAuth(projectPath, config, pm);
+  if (config.forms) await setupForms(projectPath, pm);
+  if (config.intl) await setupIntl(projectPath, pm);
 
   // Beautiful ASCII Art Header
   console.log("\n");
@@ -407,6 +290,7 @@ export const scaffoldProject = async (
         chalk.gray("━".repeat(60)) +
         "\n" +
         chalk.white("Happy coding! ") +
+        chalk.red("❤️  ") +
         chalk.gray("Built with love by ") +
         chalk.cyan.bold("Praboth Charith\n") +
         chalk.blue.underline("https://praboth.me"),
@@ -451,13 +335,18 @@ export default function Home() {
   await fs.remove(path.join(projectPath, "public/vercel.svg"));
 }
 
-async function setupPrisma(projectPath: string, deps: DependencyCollector) {
+async function setupPrisma(projectPath: string, pm: PackageManager) {
   const spinner = ora("Setting up Prisma...").start();
 
-  deps.addDevDep("prisma");
-  deps.addDep("@prisma/client");
+  const installDev = getInstallCommand(pm, ["prisma"], true);
+  await runCommand(installDev.command, installDev.args, projectPath);
 
-  await fs.ensureDir(path.join(projectPath, "prisma"));
+  const installClient = getInstallCommand(pm, ["@prisma/client"], false);
+  await runCommand(installClient.command, installClient.args, projectPath);
+
+  const dlx = getDlxCommand(pm);
+  await runCommand(dlx.command, [...dlx.args, "prisma", "init"], projectPath);
+
   await fs.writeFile(
     path.join(projectPath, "prisma/schema.prisma"),
     prismaSchema
@@ -468,10 +357,11 @@ async function setupPrisma(projectPath: string, deps: DependencyCollector) {
   spinner.succeed("Prisma setup complete");
 }
 
-async function setupReactQuery(projectPath: string, deps: DependencyCollector) {
+async function setupReactQuery(projectPath: string, pm: PackageManager) {
   const spinner = ora("Setting up React Query...").start();
 
-  deps.addDep("@tanstack/react-query");
+  const install = getInstallCommand(pm, ["@tanstack/react-query"], false);
+  await runCommand(install.command, install.args, projectPath);
 
   await fs.ensureDir(path.join(projectPath, "src/components/providers"));
   await fs.writeFile(
@@ -482,10 +372,11 @@ async function setupReactQuery(projectPath: string, deps: DependencyCollector) {
   spinner.succeed("React Query setup complete");
 }
 
-async function setupAxios(projectPath: string, deps: DependencyCollector) {
+async function setupAxios(projectPath: string, pm: PackageManager) {
   const spinner = ora("Setting up Axios...").start();
 
-  deps.addDep("axios");
+  const install = getInstallCommand(pm, ["axios"], false);
+  await runCommand(install.command, install.args, projectPath);
 
   await fs.ensureDir(path.join(projectPath, "src/lib"));
   await fs.writeFile(path.join(projectPath, "src/lib/axios.ts"), axiosClient);
@@ -493,21 +384,17 @@ async function setupAxios(projectPath: string, deps: DependencyCollector) {
   spinner.succeed("Axios setup complete");
 }
 
-async function setupUI(
-  projectPath: string,
-  ui: string,
-  deps: DependencyCollector
-) {
+async function setupUI(projectPath: string, ui: string, pm: PackageManager) {
   if (ui === "none") return;
   const spinner = ora(`Setting up UI (${ui})...`).start();
 
   if (ui === "shadcn" || ui === "both") {
-    deps.addDeps([
-      "class-variance-authority",
-      "clsx",
-      "tailwind-merge",
-      "lucide-react",
-    ]);
+    const install = getInstallCommand(
+      pm,
+      ["class-variance-authority", "clsx", "tailwind-merge", "lucide-react"],
+      false
+    );
+    await runCommand(install.command, install.args, projectPath);
 
     await fs.ensureDir(path.join(projectPath, "src/lib"));
     await fs.writeFile(
@@ -524,7 +411,12 @@ export function cn(...inputs: ClassValue[]) {
   }
 
   if (ui === "heroui" || ui === "both") {
-    deps.addDeps(["@heroui/react", "framer-motion"]);
+    const install = getInstallCommand(
+      pm,
+      ["@heroui/react", "framer-motion"],
+      false
+    );
+    await runCommand(install.command, install.args, projectPath);
 
     // Handle Tailwind Config (v4 might not include it)
     const tailwindConfigPath = path.join(projectPath, "tailwind.config.ts");
@@ -558,15 +450,14 @@ export default config;
   spinner.succeed("UI setup complete");
 }
 
-async function setupFramerMotion(
-  projectPath: string,
-  deps: DependencyCollector
-) {
-  deps.addDep("framer-motion");
+async function setupFramerMotion(projectPath: string, pm: PackageManager) {
+  const install = getInstallCommand(pm, ["framer-motion"], false);
+  await runCommand(install.command, install.args, projectPath);
 }
 
-async function setupLucide(projectPath: string, deps: DependencyCollector) {
-  deps.addDep("lucide-react");
+async function setupLucide(projectPath: string, pm: PackageManager) {
+  const install = getInstallCommand(pm, ["lucide-react"], false);
+  await runCommand(install.command, install.args, projectPath);
 }
 
 async function setupExamples(projectPath: string, config: ProjectConfig) {
@@ -643,20 +534,38 @@ README.md
   spinner.succeed("DevOps setup complete");
 }
 
-async function setupQuality(projectPath: string, deps: DependencyCollector) {
+async function setupQuality(projectPath: string, pm: PackageManager) {
   const spinner = ora("Setting up Code Quality tools...").start();
 
-  deps.addDevDeps(["husky", "lint-staged"]);
+  // Install husky and lint-staged
+  const installDeps = getInstallCommand(pm, ["husky", "lint-staged"], true);
+  await runCommand(installDeps.command, installDeps.args, projectPath);
+
+  // Initialize Husky
+  if (pm === "npm") {
+    await runCommand("npx", ["husky", "init"], projectPath);
+  } else {
+    // pnpm dlx husky init, etc.
+    // husky init updates package.json scripts "prepare": "husky" and creates .husky/pre-commit
+    const dlx = getDlxCommand(pm);
+    await runCommand(dlx.command, [...dlx.args, "husky", "init"], projectPath);
+  }
 
   // Setup lint-staged in package.json
   const packageJsonPath = path.join(projectPath, "package.json");
   const pkg = await fs.readJson(packageJsonPath);
 
+  // Let's just use "next lint" or "eslint"
   pkg["lint-staged"] = {
     "*.{ts,tsx}": "eslint --cache --fix",
   };
 
   await fs.writeJson(packageJsonPath, pkg, { spaces: 2 });
+
+  // Add pre-commit hook content for lint-staged
+  // husky init creates 'npm test' in pre-commit by default in v9
+  const preCommitPath = path.join(projectPath, ".husky/pre-commit");
+  await fs.writeFile(preCommitPath, "npx lint-staged");
 
   spinner.succeed("Code Quality tools setup complete");
 }
@@ -664,18 +573,23 @@ async function setupQuality(projectPath: string, deps: DependencyCollector) {
 async function setupTesting(
   projectPath: string,
   config: ProjectConfig,
-  deps: DependencyCollector
+  pm: PackageManager
 ) {
   const spinner = ora("Setting up Testing environment...").start();
 
   if (config.vitest) {
-    deps.addDevDeps([
-      "vitest",
-      "@vitejs/plugin-react",
-      "jsdom",
-      "@testing-library/react",
-      "@testing-library/jest-dom",
-    ]);
+    const installDev = getInstallCommand(
+      pm,
+      [
+        "vitest",
+        "@vitejs/plugin-react",
+        "jsdom",
+        "@testing-library/react",
+        "@testing-library/jest-dom",
+      ],
+      true
+    );
+    await runCommand(installDev.command, installDev.args, projectPath);
 
     await fs.writeFile(
       path.join(projectPath, "vitest.config.ts"),
@@ -698,7 +612,21 @@ async function setupTesting(
   }
 
   if (config.playwright) {
-    deps.addDevDep("@playwright/test");
+    // pnpm create playwright or init?
+    // Using 'npm init playwright@latest' is interactive.
+    // We should manually scaffold basic configs to avoid prompts or use --yes/--quiet if possible.
+    // Installing deps manually and writing config is safer for non-interactive.
+
+    const installDev = getInstallCommand(pm, ["@playwright/test"], true);
+    await runCommand(installDev.command, installDev.args, projectPath);
+
+    // Install browsers
+    const dlx = getDlxCommand(pm);
+    await runCommand(
+      dlx.command,
+      [...dlx.args, "playwright", "install", "--with-deps"],
+      projectPath
+    );
 
     await fs.writeFile(
       path.join(projectPath, "playwright.config.ts"),
@@ -721,11 +649,7 @@ async function setupTesting(
   spinner.succeed("Testing setup complete");
 }
 
-async function setupStorybook(
-  projectPath: string,
-  pm: PackageManager,
-  deps: DependencyCollector
-) {
+async function setupStorybook(projectPath: string, pm: PackageManager) {
   const spinner = ora("Setting up Storybook...").start();
 
   try {
@@ -807,12 +731,14 @@ async function setupDocumentation(
 async function setupAuth(
   projectPath: string,
   config: ProjectConfig,
-  deps: DependencyCollector
+  pm: PackageManager
 ) {
   const spinner = ora("Setting up Authentication...").start();
 
   if (config.auth === "next-auth") {
-    deps.addDep("next-auth");
+    // Install NextAuth v5 beta
+    const install = getInstallCommand(pm, ["next-auth@beta"], false);
+    await runCommand(install.command, install.args, projectPath);
 
     // Files
     await fs.ensureDir(path.join(projectPath, "src/lib"));
@@ -835,7 +761,8 @@ async function setupAuth(
     await fs.appendFile(path.join(projectPath, ".env"), nextAuthEnv);
     await fs.appendFile(path.join(projectPath, ".env.example"), nextAuthEnv);
   } else if (config.auth === "clerk") {
-    deps.addDep("@clerk/nextjs");
+    const install = getInstallCommand(pm, ["@clerk/nextjs"], false);
+    await runCommand(install.command, install.args, projectPath);
 
     // Middleware
     await fs.writeFile(
@@ -851,10 +778,15 @@ async function setupAuth(
   spinner.succeed("Authentication setup setup complete");
 }
 
-async function setupForms(projectPath: string, deps: DependencyCollector) {
+async function setupForms(projectPath: string, pm: PackageManager) {
   const spinner = ora("Setting up Forms & Validation...").start();
 
-  deps.addDeps(["react-hook-form", "zod", "@hookform/resolvers"]);
+  const install = getInstallCommand(
+    pm,
+    ["react-hook-form", "zod", "@hookform/resolvers"],
+    false
+  );
+  await runCommand(install.command, install.args, projectPath);
 
   await fs.ensureDir(path.join(projectPath, "src/lib"));
   await fs.writeFile(path.join(projectPath, "src/lib/schemas.ts"), formSchema);
@@ -868,10 +800,11 @@ async function setupForms(projectPath: string, deps: DependencyCollector) {
   spinner.succeed("Forms & Validation setup complete");
 }
 
-async function setupIntl(projectPath: string, deps: DependencyCollector) {
+async function setupIntl(projectPath: string, pm: PackageManager) {
   const spinner = ora("Setting up Internationalization...").start();
 
-  deps.addDep("next-intl");
+  const install = getInstallCommand(pm, ["next-intl"], false);
+  await runCommand(install.command, install.args, projectPath);
 
   // Messages
   await fs.ensureDir(path.join(projectPath, "messages"));
