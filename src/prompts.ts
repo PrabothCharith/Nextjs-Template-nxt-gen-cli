@@ -92,7 +92,7 @@ export async function initialPrompt(
         type: options.examples !== undefined ? null : "select",
         name: "examples",
         message: "Example processes and pages?",
-        initial: "none",
+        initial: 3, // Index of "None"
         choices: [
           { title: "CRUD Operations Example", value: "crud" },
           { title: "Authentication Example", value: "auth" },
