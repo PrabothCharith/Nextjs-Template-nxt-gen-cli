@@ -32,6 +32,7 @@ import {
   clerkEnv,
 } from "./templates/auth.js";
 import { formSchema, exampleForm } from "./templates/forms.js";
+import { messagesEn, i18nConfig, intlMiddleware } from "./templates/intl.js";
 import {
   detectPackageManager,
   getInstallCommand,
@@ -112,6 +113,7 @@ export const scaffoldProject = async (
 
   if (config.auth !== "none") await setupAuth(projectPath, config, pm);
   if (config.forms) await setupForms(projectPath, pm);
+  if (config.intl) await setupIntl(projectPath, pm);
 
   console.log(
     boxen(
@@ -612,4 +614,27 @@ async function setupForms(projectPath: string, pm: PackageManager) {
   );
 
   spinner.succeed("Forms & Validation setup complete");
+}
+
+async function setupIntl(projectPath: string, pm: PackageManager) {
+  const spinner = ora("Setting up Internationalization...").start();
+
+  const install = getInstallCommand(pm, ["next-intl"], false);
+  await runCommand(install.command, install.args, projectPath);
+
+  // Messages
+  await fs.ensureDir(path.join(projectPath, "messages"));
+  await fs.writeFile(path.join(projectPath, "messages/en.json"), messagesEn);
+
+  // Config
+  await fs.ensureDir(path.join(projectPath, "src"));
+  await fs.writeFile(path.join(projectPath, "src/i18n.ts"), i18nConfig);
+
+  // Middleware
+  await fs.writeFile(
+    path.join(projectPath, "src/middleware.ts"),
+    intlMiddleware
+  );
+
+  spinner.succeed("Internationalization setup complete");
 }

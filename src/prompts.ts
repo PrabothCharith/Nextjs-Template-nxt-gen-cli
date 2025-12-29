@@ -14,7 +14,9 @@ export interface ProjectConfig {
   vitest: boolean;
   playwright: boolean;
   storybook: boolean;
+
   forms: boolean;
+  intl: boolean;
   license: "MIT" | "Apache" | "none";
   auth: "next-auth" | "clerk" | "none";
 }
@@ -37,6 +39,7 @@ export async function initialPrompt(
     playwright: false,
     storybook: false,
     forms: false,
+    intl: false,
     license: "none",
     auth: "none",
     ...options,
@@ -133,6 +136,18 @@ export async function initialPrompt(
       initial: false,
     },
 
+    {
+      type: options.forms !== undefined ? null : "confirm",
+      name: "forms",
+      message: "Setup Forms (React Hook Form + Zod)?",
+      initial: true,
+    },
+    {
+      type: options.intl !== undefined ? null : "confirm",
+      name: "intl",
+      message: "Add Internationalization (next-intl)?",
+      initial: false,
+    },
     {
       type: options.license !== undefined ? null : "select",
       name: "license",

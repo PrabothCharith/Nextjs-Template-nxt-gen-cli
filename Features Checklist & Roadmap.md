@@ -32,4 +32,4 @@ This document correlates to the planned improvements for `nxt-gen-cli`.
 ### Feature Expansion (New Scaffolding Options)
 - [x] **Authentication**: Add first-class scaffolding for **Auth.js (NextAuth)** and **Clerk**.
 - [x] **Forms & Validation**: Add option to pre-configure **React Hook Form** with **Zod** resolvers.
-- [ ] **Internationalization**: Add scaffolding for `next-intl` for multi-language support.
+- [x] **Internationalization**: Add scaffolding for `next-intl` for multi-language support.
