@@ -46,8 +46,8 @@ export function getDlxCommand(pm: PackageManager): {
     // Yarn 1 (classic) relies on npx effectively, or global installs.
     // Modern yarn uses yarn dlx. Assuming npx is safe fallback or we use npx for yarn/npm.
     case "yarn":
-      return { command: "npx", args: [] };
+      return { command: "npx", args: ["--yes"] };
     default:
-      return { command: "npx", args: [] };
+      return { command: "npx", args: ["--yes"] };
   }
 }
