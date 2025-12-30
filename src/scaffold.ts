@@ -16,6 +16,7 @@ import {
 
 import {
   exampleApiHandler,
+  exampleApiIdHandler,
   examplePage,
   hubPage,
 } from "./templates/examples.js";
@@ -592,6 +593,13 @@ async function setupExamples(projectPath: string, config: ProjectConfig) {
     await fs.writeFile(
       path.join(projectPath, "src/app/api/posts/route.ts"),
       exampleApiHandler(config.prisma)
+    );
+
+    // Dynamic API Route ([id])
+    await fs.ensureDir(path.join(projectPath, "src/app/api/posts/[id]"));
+    await fs.writeFile(
+      path.join(projectPath, "src/app/api/posts/[id]/route.ts"),
+      exampleApiIdHandler(config.prisma)
     );
 
     // Page
