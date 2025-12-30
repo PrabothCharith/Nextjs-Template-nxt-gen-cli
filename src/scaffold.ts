@@ -196,6 +196,12 @@ export const scaffoldProject = async (
 
         spinner.succeed("Dependencies installed successfully");
 
+        if (config.prisma) {
+          const prismaSpinner = ora("Generating Prisma Client...").start();
+          await runCommand("npx", ["prisma", "generate"], projectPath);
+          prismaSpinner.succeed("Prisma Client generated");
+        }
+
         if (config.playwright) {
           const playwrightSpinner = ora(
             "Installing Playwright browsers..."
