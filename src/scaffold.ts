@@ -452,6 +452,8 @@ async function setupPrisma(projectPath: string, deps: DependencyCollector) {
   deps.addDevDep("prisma");
   deps.addDevDep("dotenv");
   deps.addDep("@prisma/client");
+  deps.addDep("@prisma/adapter-libsql");
+  deps.addDep("@libsql/client@0.8.1");
 
   await fs.ensureDir(path.join(projectPath, "prisma"));
   await fs.writeFile(
