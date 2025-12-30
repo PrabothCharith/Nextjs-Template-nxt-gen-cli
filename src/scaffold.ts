@@ -450,6 +450,7 @@ async function setupPrisma(projectPath: string, deps: DependencyCollector) {
   const spinner = ora("Setting up Prisma...").start();
 
   deps.addDevDep("prisma");
+  deps.addDevDep("dotenv");
   deps.addDep("@prisma/client");
 
   await fs.ensureDir(path.join(projectPath, "prisma"));
