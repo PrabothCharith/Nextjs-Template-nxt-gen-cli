@@ -117,7 +117,12 @@ export async function initialPrompt(
         type: options.examples !== undefined ? null : "select",
         name: "examples",
         message: "Example processes and pages?",
-        initial: 3, // Index of "None"
+        initial: (prev, values) => {
+          // If auth is enabled, we have 4 options (CRUD, Auth, Both, None) -> Index 3
+          // If auth is disabled, we have 2 options (CRUD, None) -> Index 1
+          if (values.auth && values.auth !== "none") return 3;
+          return 1;
+        },
         choices: (prev, values) => {
           const options = [{ title: "CRUD Operations Example", value: "crud" }];
 
