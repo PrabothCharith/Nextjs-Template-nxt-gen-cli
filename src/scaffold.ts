@@ -253,78 +253,6 @@ export const scaffoldProject = async (
     }
   }
 
-  // Beautiful ASCII Art Header
-  console.log("\n");
-  console.log(
-    chalk
-      .hex("#eb5939")
-      .bold(
-        "  ╔═════════════════════════════════════════════════════════════════════╗"
-      )
-  );
-  console.log(
-    chalk
-      .hex("#eb5939")
-      .bold(
-        "  ║                                                                     ║"
-      )
-  );
-  console.log(
-    chalk.hex("#eb5939").bold("  ║     ") +
-      chalk
-        .hex("#eb5939")
-        .bold("███╗   ██╗██╗  ██╗████████╗      ██████╗ ███████╗███╗   ██╗") +
-      chalk.hex("#eb5939").bold("     ║")
-  );
-  console.log(
-    chalk.hex("#eb5939").bold("  ║     ") +
-      chalk
-        .hex("#eb5939")
-        .bold("████╗  ██║╚██╗██╔╝╚══██╔══╝     ██╔════╝ ██╔════╝████╗  ██║") +
-      chalk.hex("#eb5939").bold("     ║")
-  );
-  console.log(
-    chalk.hex("#eb5939").bold("  ║     ") +
-      chalk
-        .hex("#eb5939")
-        .bold("██╔██╗ ██║ ╚███╔╝    ██║        ██║  ███╗█████╗  ██╔██╗ ██║") +
-      chalk.hex("#eb5939").bold("     ║")
-  );
-  console.log(
-    chalk.hex("#eb5939").bold("  ║     ") +
-      chalk
-        .hex("#eb5939")
-        .bold("██║╚██╗██║ ██╔██╗    ██║        ██║   ██║██╔══╝  ██║╚██╗██║") +
-      chalk.hex("#eb5939").bold("     ║")
-  );
-  console.log(
-    chalk.hex("#eb5939").bold("  ║     ") +
-      chalk
-        .hex("#eb5939")
-        .bold("██║ ╚████║██╔╝ ██╗   ██║███████╗╚██████╔╝███████╗██║ ╚████║") +
-      chalk.hex("#eb5939").bold("     ║")
-  );
-  console.log(
-    chalk.hex("#eb5939").bold("  ║     ") +
-      chalk
-        .hex("#eb5939")
-        .bold("╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝╚══════╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝") +
-      chalk.hex("#eb5939").bold("     ║")
-  );
-  console.log(
-    chalk
-      .hex("#eb5939")
-      .bold(
-        "  ║                                                                     ║"
-      )
-  );
-  console.log(
-    chalk
-      .hex("#eb5939")
-      .bold(
-        "  ╚═════════════════════════════════════════════════════════════════════╝"
-      )
-  );
   console.log("\n");
 
   // Success Message
@@ -439,6 +367,78 @@ export const scaffoldProject = async (
     )
   );
 
+  // Beautiful ASCII Art Header
+  console.log("\n");
+  console.log(
+    chalk
+      .hex("#eb5939")
+      .bold(
+        "  ╔═════════════════════════════════════════════════════════════════════╗"
+      )
+  );
+  console.log(
+    chalk
+      .hex("#eb5939")
+      .bold(
+        "  ║                                                                     ║"
+      )
+  );
+  console.log(
+    chalk.hex("#eb5939").bold("  ║     ") +
+      chalk
+        .hex("#eb5939")
+        .bold("███╗   ██╗██╗  ██╗████████╗      ██████╗ ███████╗███╗   ██╗") +
+      chalk.hex("#eb5939").bold("     ║")
+  );
+  console.log(
+    chalk.hex("#eb5939").bold("  ║     ") +
+      chalk
+        .hex("#eb5939")
+        .bold("████╗  ██║╚██╗██╔╝╚══██╔══╝     ██╔════╝ ██╔════╝████╗  ██║") +
+      chalk.hex("#eb5939").bold("     ║")
+  );
+  console.log(
+    chalk.hex("#eb5939").bold("  ║     ") +
+      chalk
+        .hex("#eb5939")
+        .bold("██╔██╗ ██║ ╚███╔╝    ██║        ██║  ███╗█████╗  ██╔██╗ ██║") +
+      chalk.hex("#eb5939").bold("     ║")
+  );
+  console.log(
+    chalk.hex("#eb5939").bold("  ║     ") +
+      chalk
+        .hex("#eb5939")
+        .bold("██║╚██╗██║ ██╔██╗    ██║        ██║   ██║██╔══╝  ██║╚██╗██║") +
+      chalk.hex("#eb5939").bold("     ║")
+  );
+  console.log(
+    chalk.hex("#eb5939").bold("  ║     ") +
+      chalk
+        .hex("#eb5939")
+        .bold("██║ ╚████║██╔╝ ██╗   ██║███████╗╚██████╔╝███████╗██║ ╚████║") +
+      chalk.hex("#eb5939").bold("     ║")
+  );
+  console.log(
+    chalk.hex("#eb5939").bold("  ║     ") +
+      chalk
+        .hex("#eb5939")
+        .bold("╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝╚══════╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝") +
+      chalk.hex("#eb5939").bold("     ║")
+  );
+  console.log(
+    chalk
+      .hex("#eb5939")
+      .bold(
+        "  ║                                                                     ║"
+      )
+  );
+  console.log(
+    chalk
+      .hex("#eb5939")
+      .bold(
+        "  ╚═════════════════════════════════════════════════════════════════════╝"
+      )
+  );
   console.log("\n");
 };
 
