@@ -35,7 +35,8 @@ import {
   exampleTest,
   exampleE2E,
 } from "./templates/testing.js";
-import { readmeTemplate, mitLicense, apacheLicense } from "./templates/docs.js";
+import { generateReadme } from "./templates/readme.js";
+import { mitLicense, apacheLicense } from "./templates/docs.js";
 import {
   nextAuthFile,
   nextAuthApiRoute,
@@ -892,28 +893,10 @@ async function setupDocumentation(
 ) {
   const spinner = ora("Generating documentation...").start();
 
-  // Features list for README
-  const features: string[] = ["Next.js 14+", "Tailwind CSS", "TypeScript"];
-  if (config.orm === "prisma") features.push("Prisma ORM");
-  if (config.orm === "drizzle") features.push("Drizzle ORM");
-  if (config.reactQuery) features.push("TanStack Query");
-  if (config.axios) features.push("Axios");
-  if (config.ui === "shadcn" || config.ui === "both")
-    features.push("Shadcn UI");
-  if (config.ui === "heroui" || config.ui === "both") features.push("HeroUI");
-  if (config.framerMotion) features.push("Framer Motion");
-  if (config.lucide) features.push("Lucide React Icons");
-  if (config.docker) features.push("Docker Support");
-  if (config.ci) features.push("GitHub Actions CI");
-  if (config.husky) features.push("Husky & Lint-staged");
-  if (config.vitest) features.push("Vitest Testing");
-  if (config.playwright) features.push("Playwright E2E Testing");
-  if (config.storybook) features.push("Storybook");
-
   // README
   await fs.writeFile(
     path.join(projectPath, "README.md"),
-    readmeTemplate(projectName, pm, features)
+    generateReadme(projectName, pm, config)
   );
 
   // LICENSE
