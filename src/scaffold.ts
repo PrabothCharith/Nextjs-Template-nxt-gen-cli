@@ -20,7 +20,13 @@ import {
   examplePage,
   hubPage,
 } from "./templates/examples.js";
+
 import { localDbFile } from "./templates/local-db.js";
+import {
+  drizzleConfig,
+  drizzleClient,
+  drizzleSchema,
+} from "./templates/drizzle.js";
 import { dockerfile, ciWorkflow, envExample } from "./templates/devops.js";
 import {
   vitestConfig,
@@ -100,7 +106,8 @@ export const scaffoldProject = async (
   // Generate all files (no installations yet)
   console.log(chalk.blue("\nGenerating project files...\n"));
 
-  if (config.prisma) await setupPrisma(projectPath, deps);
+  if (config.orm === "prisma") await setupPrisma(projectPath, deps);
+  if (config.orm === "drizzle") await setupDrizzle(projectPath, deps);
   if (config.reactQuery) await setupReactQuery(projectPath, deps);
   if (config.axios) await setupAxios(projectPath, deps);
 
@@ -121,7 +128,7 @@ export const scaffoldProject = async (
   await fs.writeFile(
     path.join(projectPath, ".env.example"),
     envExample(
-      config.prisma,
+      config.orm,
       config.examples === "auth" || config.examples === "both"
     )
   );
@@ -199,10 +206,16 @@ export const scaffoldProject = async (
 
         spinner.succeed("Dependencies installed successfully");
 
-        if (config.prisma) {
+        if (config.orm === "prisma") {
           const prismaSpinner = ora("Generating Prisma Client...").start();
           await runCommand("npx", ["prisma", "generate"], projectPath);
           prismaSpinner.succeed("Prisma Client generated");
+        }
+
+        if (config.orm === "drizzle") {
+          const drizzleSpinner = ora("Pushing Drizzle Schema...").start();
+          await runCommand("npx", ["drizzle-kit", "push"], projectPath);
+          drizzleSpinner.succeed("Drizzle Schema pushed");
         }
 
         if (config.playwright) {
@@ -368,7 +381,7 @@ export const scaffoldProject = async (
             "README.md"
           )} for detailed setup\n`
         ) +
-        (config.prisma
+        (config.orm === "prisma" || config.orm === "drizzle"
           ? chalk.white(
               `  ${chalk.cyan("•")} Configure ${chalk.magenta(
                 ".env"
@@ -485,6 +498,39 @@ async function setupPrisma(projectPath: string, deps: DependencyCollector) {
   spinner.succeed("Prisma setup complete");
 }
 
+async function setupDrizzle(projectPath: string, deps: DependencyCollector) {
+  const spinner = ora("Setting up Drizzle...").start();
+
+  deps.addDevDep("drizzle-kit");
+  deps.addDevDep("dotenv");
+  deps.addDep("drizzle-orm");
+  deps.addDep("@libsql/client");
+
+  // drizzle.config.ts
+  await fs.writeFile(
+    path.join(projectPath, "drizzle.config.ts"),
+    drizzleConfig
+  );
+
+  // src/db/schema.ts
+  await fs.ensureDir(path.join(projectPath, "src/db"));
+  await fs.writeFile(path.join(projectPath, "src/db/schema.ts"), drizzleSchema);
+
+  // src/lib/db.ts
+  await fs.ensureDir(path.join(projectPath, "src/lib"));
+  await fs.writeFile(path.join(projectPath, "src/lib/db.ts"), drizzleClient);
+
+  // Add DATABASE_URL to .env
+  const envPath = path.join(projectPath, ".env");
+  if (!(await fs.pathExists(envPath))) {
+    await fs.writeFile(envPath, "");
+  }
+
+  await fs.appendFile(envPath, '\nDATABASE_URL="file:./dev.db"\n');
+
+  spinner.succeed("Drizzle setup complete");
+}
+
 async function setupReactQuery(projectPath: string, deps: DependencyCollector) {
   const spinner = ora("Setting up React Query...").start();
 
@@ -589,8 +635,8 @@ async function setupLucide(projectPath: string, deps: DependencyCollector) {
 async function setupExamples(projectPath: string, config: ProjectConfig) {
   // If CRUD example
   if (config.examples === "crud" || config.examples === "both") {
-    // Setup Local DB if not using Prisma
-    if (!config.prisma) {
+    // Setup Local DB if not using an ORM
+    if (config.orm === "none") {
       await fs.ensureDir(path.join(projectPath, "src/lib"));
       await fs.writeFile(path.join(projectPath, "src/lib/db.ts"), localDbFile);
     }
@@ -599,14 +645,14 @@ async function setupExamples(projectPath: string, config: ProjectConfig) {
     await fs.ensureDir(path.join(projectPath, "src/app/api/posts"));
     await fs.writeFile(
       path.join(projectPath, "src/app/api/posts/route.ts"),
-      exampleApiHandler(config.prisma)
+      exampleApiHandler(config.orm)
     );
 
     // Dynamic API Route ([id])
     await fs.ensureDir(path.join(projectPath, "src/app/api/posts/[id]"));
     await fs.writeFile(
       path.join(projectPath, "src/app/api/posts/[id]/route.ts"),
-      exampleApiIdHandler(config.prisma)
+      exampleApiIdHandler(config.orm)
     );
 
     // Page
@@ -844,7 +890,8 @@ async function setupDocumentation(
 
   // Features list for README
   const features: string[] = ["Next.js 14+", "Tailwind CSS", "TypeScript"];
-  if (config.prisma) features.push("Prisma ORM");
+  if (config.orm === "prisma") features.push("Prisma ORM");
+  if (config.orm === "drizzle") features.push("Drizzle ORM");
   if (config.reactQuery) features.push("TanStack Query");
   if (config.axios) features.push("Axios");
   if (config.ui === "shadcn" || config.ui === "both")

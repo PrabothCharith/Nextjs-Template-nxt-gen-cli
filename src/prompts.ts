@@ -1,7 +1,7 @@
 import prompts from "prompts";
 
 export interface ProjectConfig {
-  prisma: boolean;
+  orm: "prisma" | "drizzle" | "none";
   reactQuery: boolean;
   axios: boolean;
   ui: "shadcn" | "heroui" | "both" | "none";
@@ -25,7 +25,7 @@ export async function initialPrompt(
   options: Partial<ProjectConfig> = {}
 ): Promise<ProjectConfig> {
   const defaults: ProjectConfig = {
-    prisma: false,
+    orm: "none",
     reactQuery: false,
     axios: false,
     ui: "none",
@@ -48,10 +48,15 @@ export async function initialPrompt(
   const response = await prompts(
     [
       {
-        type: options.prisma !== undefined ? null : "confirm",
-        name: "prisma",
-        message: "Do you want install Prisma ORM for database operations?",
-        initial: true,
+        type: options.orm !== undefined ? null : "select",
+        name: "orm",
+        message: "Which ORM would you like to use?",
+        choices: [
+          { title: "Prisma", value: "prisma" },
+          { title: "Drizzle", value: "drizzle" },
+          { title: "None", value: "none" },
+        ],
+        initial: 0,
       },
       {
         type: options.reactQuery !== undefined ? null : "confirm",

@@ -119,11 +119,14 @@ jobs:
       run: \${{ steps.detect-package-manager.outputs.manager }} run build
 `;
 
-export const envExample = (prisma: boolean, auth: boolean) => {
+export const envExample = (
+  orm: "prisma" | "drizzle" | "none",
+  auth: boolean
+) => {
   let content = `# Environment Variables\n\n`;
 
-  if (prisma) {
-    content += `# Prisma Database URL
+  if (orm === "prisma" || orm === "drizzle") {
+    content += `# Database URL
 # DATABASE_URL="postgresql://user:password@localhost:5432/mydb?schema=public"
 # DATABASE_URL="file:./dev.db"
 `;

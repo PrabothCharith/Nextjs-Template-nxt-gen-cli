@@ -1,14 +1,16 @@
-export const exampleApiHandler = (hasPrisma: boolean) => `
+export const exampleApiHandler = (orm: "prisma" | "drizzle" | "none") => `
 import { NextResponse } from 'next/server';
 ${
-  hasPrisma
+  orm === "prisma"
     ? "import prisma from '@/lib/prisma';"
+    : orm === "drizzle"
+    ? "import { db } from '@/lib/db';\\nimport { posts } from '@/db/schema';\\nimport { like, or, desc } from 'drizzle-orm';"
     : "import { db } from '@/lib/db';"
 }
 
 export async function GET(request: Request) {
   ${
-    hasPrisma
+    orm === "prisma"
       ? `
   const { searchParams } = new URL(request.url);
   const search = searchParams.get('search');
@@ -22,10 +24,20 @@ export async function GET(request: Request) {
       }
     : {};
 
-  const posts = await prisma.post.findMany({
+  const result = await prisma.post.findMany({
     where,
     orderBy: { createdAt: 'desc' },
   });`
+      : orm === "drizzle"
+      ? `
+  const { searchParams } = new URL(request.url);
+  const search = searchParams.get('search');
+
+  const result = await db.select().from(posts).where(
+    search 
+      ? or(like(posts.title, \`%\${search}%\`), like(posts.content, \`%\${search}%\`))
+      : undefined
+  ).orderBy(desc(posts.createdAt));`
       : `
   const { searchParams } = new URL(request.url);
   const search = searchParams.get('search');
@@ -39,30 +51,34 @@ export async function GET(request: Request) {
       }
     : undefined;
 
-  const posts = await db.post.findMany({ 
+  const result = await db.post.findMany({ 
     where,
     orderBy: { createdAt: 'desc' }
   });`
   }
-  return NextResponse.json(posts);
+  return NextResponse.json(result);
 }
 
 export async function POST(request: Request) {
   const body = await request.json();
   ${
-    hasPrisma
+    orm === "prisma"
       ? "const post = await prisma.post.create({ data: { title: body.title, content: body.content } });"
+      : orm === "drizzle"
+      ? "const post = await db.insert(posts).values({ title: body.title, content: body.content }).returning();"
       : "const post = await db.post.create({ data: { title: body.title, content: body.content } });"
   }
-  return NextResponse.json(post);
+  return NextResponse.json(orm === "drizzle" ? post[0] : post);
 }
 `;
 
-export const exampleApiIdHandler = (hasPrisma: boolean) => `
+export const exampleApiIdHandler = (orm: "prisma" | "drizzle" | "none") => `
 import { NextResponse } from 'next/server';
 ${
-  hasPrisma
+  orm === "prisma"
     ? "import prisma from '@/lib/prisma';"
+    : orm === "drizzle"
+    ? "import { db } from '@/lib/db';\\nimport { posts } from '@/db/schema';\\nimport { eq } from 'drizzle-orm';"
     : "import { db } from '@/lib/db';"
 }
 
@@ -71,22 +87,28 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+  const { id } = await params;
   const postId = Number(id);
   const body = await request.json();
 
   try {
     ${
-      hasPrisma
+      orm === "prisma"
         ? `const post = await prisma.post.update({
       where: { id: postId },
       data: { title: body.title, content: body.content },
     });`
+        : orm === "drizzle"
+        ? `const post = await db.update(posts)
+        .set({ title: body.title, content: body.content })
+        .where(eq(posts.id, postId))
+        .returning();`
         : `const post = await db.post.update({
       where: { id: postId },
       data: { title: body.title, content: body.content },
     });`
     }
-    return NextResponse.json(post);
+    return NextResponse.json(orm === "drizzle" ? post[0] : post);
   } catch (error) {
     return NextResponse.json({ error: 'Post not found or update failed' }, { status: 500 });
   }
@@ -97,14 +119,16 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
    const { id } = await params;
-   ${hasPrisma ? "const postId = Number(id);" : ""}
+   const postId = Number(id);
 
   try {
     ${
-      hasPrisma
+      orm === "prisma"
         ? `await prisma.post.delete({
       where: { id: postId },
     });`
+        : orm === "drizzle"
+        ? `await db.delete(posts).where(eq(posts.id, postId));`
         : `await db.post.delete({
       where: { id: postId },
     });`
