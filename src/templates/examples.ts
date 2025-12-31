@@ -1,6 +1,10 @@
 export const exampleApiHandler = (hasPrisma: boolean) => `
 import { NextResponse } from 'next/server';
-${hasPrisma ? "import prisma from '@/lib/prisma';" : ""}
+${
+  hasPrisma
+    ? "import prisma from '@/lib/prisma';"
+    : "import { db } from '@/lib/db';"
+}
 
 export async function GET(request: Request) {
   ${
@@ -22,7 +26,23 @@ export async function GET(request: Request) {
     where,
     orderBy: { createdAt: 'desc' },
   });`
-      : "const posts = [{ id: 1, title: 'Hello World', content: 'This is a mock post' }];"
+      : `
+  const { searchParams } = new URL(request.url);
+  const search = searchParams.get('search');
+  
+  const where = search 
+    ? {
+        OR: [
+          { title: { contains: search } },
+          { content: { contains: search } },
+        ]
+      }
+    : undefined;
+
+  const posts = await db.post.findMany({ 
+    where,
+    orderBy: { createdAt: 'desc' }
+  });`
   }
   return NextResponse.json(posts);
 }
@@ -32,7 +52,7 @@ export async function POST(request: Request) {
   ${
     hasPrisma
       ? "const post = await prisma.post.create({ data: { title: body.title, content: body.content } });"
-      : "const post = { id: Date.now(), ...body };"
+      : "const post = await db.post.create({ data: { title: body.title, content: body.content } });"
   }
   return NextResponse.json(post);
 }
@@ -40,14 +60,18 @@ export async function POST(request: Request) {
 
 export const exampleApiIdHandler = (hasPrisma: boolean) => `
 import { NextResponse } from 'next/server';
-${hasPrisma ? "import prisma from '@/lib/prisma';" : ""}
+${
+  hasPrisma
+    ? "import prisma from '@/lib/prisma';"
+    : "import { db } from '@/lib/db';"
+}
 
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
-  ${hasPrisma ? "const postId = Number(id);" : ""}
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+  const postId = Number(id);
   const body = await request.json();
 
   try {
@@ -57,7 +81,10 @@ export async function PUT(
       where: { id: postId },
       data: { title: body.title, content: body.content },
     });`
-        : "const post = { id, ...body };"
+        : `const post = await db.post.update({
+      where: { id: postId },
+      data: { title: body.title, content: body.content },
+    });`
     }
     return NextResponse.json(post);
   } catch (error) {
@@ -78,7 +105,9 @@ export async function DELETE(
         ? `await prisma.post.delete({
       where: { id: postId },
     });`
-        : ""
+        : `await db.post.delete({
+      where: { id: postId },
+    });`
     }
     return NextResponse.json({ message: 'Post deleted' });
   } catch (error) {

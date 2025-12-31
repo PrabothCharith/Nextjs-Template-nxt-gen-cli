@@ -20,6 +20,7 @@ import {
   examplePage,
   hubPage,
 } from "./templates/examples.js";
+import { localDbFile } from "./templates/local-db.js";
 import { dockerfile, ciWorkflow, envExample } from "./templates/devops.js";
 import {
   vitestConfig,
@@ -588,6 +589,12 @@ async function setupLucide(projectPath: string, deps: DependencyCollector) {
 async function setupExamples(projectPath: string, config: ProjectConfig) {
   // If CRUD example
   if (config.examples === "crud" || config.examples === "both") {
+    // Setup Local DB if not using Prisma
+    if (!config.prisma) {
+      await fs.ensureDir(path.join(projectPath, "src/lib"));
+      await fs.writeFile(path.join(projectPath, "src/lib/db.ts"), localDbFile);
+    }
+
     // API Route
     await fs.ensureDir(path.join(projectPath, "src/app/api/posts"));
     await fs.writeFile(
