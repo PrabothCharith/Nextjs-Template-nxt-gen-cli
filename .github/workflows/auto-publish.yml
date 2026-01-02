@@ -8,6 +8,7 @@ on:
 permissions:
   id-token: write
   contents: write # Required for pushing tags and creating releases
+  packages: write # Required for publishing to GitHub Packages
 
 jobs:
   publish:
@@ -44,6 +45,17 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Publish to GitHub Packages
+        run: |
+          # Configure npm to use GitHub Packages registry
+          echo "@PrabothCharith:registry=https://npm.pkg.github.com" > .npmrc
+          # Temporarily change the package name to the scoped version for GPR
+          npm pkg set name="@PrabothCharith/nxt-gen-cli"
+          # Publish using the GITHUB_TOKEN
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Git Tag
         run: |
           git config user.name "github-actions[bot]"
@@ -67,6 +79,11 @@ jobs:
             Or install globally:
             ```bash
             npm install -g nxt-gen-cli@${{ steps.version.outputs.package_version }}
+            ```
+
+            ### GitHub Packages
+            ```bash
+            npm install @PrabothCharith/nxt-gen-cli@${{ steps.version.outputs.package_version }}
             ```
           draft: false
           prerelease: false
