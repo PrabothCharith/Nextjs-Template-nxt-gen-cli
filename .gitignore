@@ -39,4 +39,5 @@ yarn-error.log*
 
 # Testing
 coverage
-test/*
+test/*.npm-cache
+.npm-cache
