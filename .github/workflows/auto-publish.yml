@@ -49,6 +49,7 @@ jobs:
         run: |
           # Configure npm to use GitHub Packages registry
           echo "@PrabothCharith:registry=https://npm.pkg.github.com" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
           # Temporarily change the package name to the scoped version for GPR
           npm pkg set name="@PrabothCharith/nxt-gen-cli"
           # Publish using the GH_TOKEN
